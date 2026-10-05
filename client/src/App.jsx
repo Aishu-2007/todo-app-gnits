@@ -5,9 +5,13 @@ import Sidebar from "./components/Sidebar";
 import TodoForm from "./components/TodoForm";
 import TodoItem from "./components/TodoItem";
 
+const PAGE_SIZE = 6;
+
 function App() {
   const [todos, setTodos] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -32,6 +36,7 @@ function App() {
     run(async () => {
       const newTodo = await createTodo(title);
       setTodos((prev) => [newTodo, ...prev]);
+      setPage(1);
     });
 
   const handleUpdate = (id, data) =>
@@ -55,14 +60,26 @@ function App() {
       setTodos((prev) => prev.filter((t) => !t.completed));
     });
 
-  const filteredTodos = todos.filter(FILTERS[filter].test);
+  const searchTerm = search.trim().toLowerCase();
+  const filteredTodos = todos
+    .filter(FILTERS[filter].test)
+    .filter((todo) => todo.title.toLowerCase().includes(searchTerm));
+  const totalPages = Math.max(1, Math.ceil(filteredTodos.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageTodos = filteredTodos.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   return (
     <div className="layout">
       <Sidebar
         todos={todos}
         filter={filter}
-        onFilter={setFilter}
+        onFilter={(nextFilter) => {
+          setFilter(nextFilter);
+          setPage(1);
+        }}
         onClearDone={handleClearDone}
       />
 
@@ -75,6 +92,22 @@ function App() {
         </header>
 
         <TodoForm onAdd={handleAdd} />
+
+        <div className="todo-search">
+          <label className="sr-only" htmlFor="todo-search-input">
+            Search tasks
+          </label>
+          <input
+            id="todo-search-input"
+            type="search"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(1);
+            }}
+            placeholder="Search tasks..."
+          />
+        </div>
 
         {error && (
           <div className="error" role="alert">
@@ -90,23 +123,46 @@ function App() {
         ) : filteredTodos.length === 0 ? (
           <div className="empty">
             <img src="/logo.png" alt="" />
-            <p>
-              {filter === "done"
+            <p>{searchTerm
+              ? `No tasks match "${search.trim()}".`
+              : filter === "done"
                 ? "Nothing completed yet"
-                : "You're all caught up. Add a task above."}
-            </p>
+                : "You're all caught up. Add a task above."}</p>
           </div>
         ) : (
-          <ul className="todo-list">
-            {filteredTodos.map((todo) => (
-              <TodoItem
-                key={todo._id}
-                todo={todo}
-                onUpdate={handleUpdate}
-                onDelete={handleDelete}
-              />
-            ))}
-          </ul>
+          <>
+            <ul className="todo-list">
+              {pageTodos.map((todo) => (
+                <TodoItem
+                  key={todo._id}
+                  todo={todo}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </ul>
+            {totalPages > 1 && (
+              <nav className="pagination" aria-label="Todo list pages">
+                <button
+                  type="button"
+                  onClick={() => setPage((previous) => previous - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <span aria-live="polite">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage((previous) => previous + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </nav>
+            )}
+          </>
         )}
       </main>
     </div>
