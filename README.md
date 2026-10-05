@@ -1,9 +1,19 @@
 # Todo App (React + Node + Express + MongoDB)
 
+A full-stack todo app. The frontend is React (Vite), the backend is Node + Express, and data is stored in MongoDB Atlas.
+
+## Goals
+
+By the end, your app should:
+
+1. **Be complete.** The missing pieces in the server and client are filled in, and every API route creates, reads, updates or deletes todos correctly and returns the right response and status code.
+2. **Run locally.** The frontend at http://localhost:5173 talks to your backend and saves todos to MongoDB Atlas.
+3. **Run on Render.** The same app is deployed as a single Render service, reachable at a public URL.
+
 ## Folder structure
 
 ```
-todo-app/
+todo-app-gnits/
 ├── client/                  # React (Vite)
 │   ├── src/
 │   │   ├── components/
@@ -27,18 +37,7 @@ todo-app/
 └── package.json             # root scripts
 ```
 
-## API
-
-| Method | Route            | What it does      |
-| ------ | ---------------- | ----------------- |
-| GET    | /api/todos       | Get all todos     |
-| POST   | /api/todos       | Create a todo     |
-| PUT    | /api/todos/:id   | Update a todo     |
-| DELETE | /api/todos/:id   | Delete a todo     |
-
-> ⚠️ **The controllers still need work.** Some functions in `server/controllers/todoController.js` are empty or incorrect. Finish and fix them so every route in the table above works as described, and make sure each one returns relevant responses with the appropriate status codes (e.g. `200`, `201`, `400`, `404`, `500`).
-
-## Run locally
+## Step 1: Set up the project
 
 1. Copy `server/.env.example` to `server/.env` and put in your MongoDB Atlas URL.
 2. Install everything:
@@ -47,17 +46,37 @@ todo-app/
    npm install --prefix server
    npm install --prefix client
    ```
-3. Start both frontend and backend:
+
+## Step 2: Find and complete the missing pieces
+
+> ⚠️ **The app is not finished yet.** A couple of pieces are missing or incorrect in both the **server** and the **client**. Study the code, find what's missing, and complete it so the app works end to end.
+
+- **Server:** Some functions in `server/controllers/todoController.js` are empty or incorrect. Finish and fix them so every route below works as described, and make sure each one returns relevant responses with the appropriate status codes (e.g. `200`, `201`, `400`, `404`, `500`).
+- **Client:** Some parts of the React app don't do their job yet. Follow the flow from the UI to `api.js` and back, and fill in what's missing. Look for `TODO` comments as a starting point, but not every gap is marked.
+
+| Method | Route            | What it does      |
+| ------ | ---------------- | ----------------- |
+| GET    | /api/todos       | Get all todos     |
+| POST   | /api/todos       | Create a todo     |
+| PUT    | /api/todos/:id   | Update a todo     |
+| DELETE | /api/todos/:id   | Delete a todo     |
+
+## Step 3: Run locally
+
+1. Start both frontend and backend:
    ```bash
    npm run dev
    ```
-4. Open http://localhost:5173
+2. Open http://localhost:5173 and check that you can add, edit, complete and delete todos, and that they are still there after a page refresh.
 
 > The API runs on port 5001 (set by `PORT` in `server/.env`). Port 5000 is avoided because macOS AirPlay Receiver uses it. If you change `PORT`, update the proxy target in `client/vite.config.js` too.
 
-## Deploy on Render (one service)
+## Step 4: Deploy on Render (one service)
 
-- Build command: `npm run build`
-- Start command: `npm start`
-- Environment variable: `MONGO_URI` = your Atlas URL
-- In Atlas → Network Access, allow `0.0.0.0/0`
+1. Push your code to GitHub.
+2. On Render, create a new **Web Service** from your repo with these settings:
+   - Build command: `npm run build`
+   - Start command: `npm start`
+   - Environment variable: `MONGO_URI` = your Atlas URL
+3. In Atlas → Network Access, allow `0.0.0.0/0` so Render can connect.
+4. Once the deploy finishes, open your Render URL and test the app the same way you did locally.
