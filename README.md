@@ -36,6 +36,8 @@ todo-app/
 | PUT    | /api/todos/:id   | Update a todo     |
 | DELETE | /api/todos/:id   | Delete a todo     |
 
+> ⚠️ **The controllers still need work.** Some functions in `server/controllers/todoController.js` are empty or incorrect. Finish and fix them so every route in the table above works as described, and make sure each one returns relevant responses with the appropriate status codes (e.g. `200`, `201`, `400`, `404`, `500`).
+
 ## Run locally
 
 1. Copy `server/.env.example` to `server/.env` and put in your MongoDB Atlas URL.
